@@ -55,11 +55,18 @@ static func build_node(s: SwordData) -> Node3D:
 		hmi.material_override = hmat
 		root.add_child(hmi)
 
-	var fmat := MeshKit.mat(Palette.STEEL_DARK, 0.28, 1.0)
+# 护手材质：以玩家选的颜色/金属度/粗糙度为准。
+# 只有颜色还是默认灰时，才用 guard_style 的预设色（铜 / 木），
+# 这样"铜护手""木护手"仍有区分，而玩家改过色之后以玩家为准。
+var gcol := s.guard_color
+var gmet := s.guard_metal
+var grou := s.guard_rough
+if gcol.is_equal_approx(Color("8a8f96")):
 	if s.guard_style == 2:
-		fmat = MeshKit.mat(Color("c9a04a"), 0.3, 1.0)
+		gcol = Color("c9a04a"); gmet = 1.0; grou = 0.30
 	elif s.guard_style == 3:
-		fmat = MeshKit.mat(Palette.WOOD_DARK, 0.75, 0.0)
+		gcol = Palette.WOOD_DARK; gmet = 0.0; grou = 0.75
+var fmat := MeshKit.mat(gcol, grou, gmet)
 	var fm := HandleBuilder.build_fittings(s, info["butt"], info["butt_dir"], 1)
 	if fm != null:
 		var fmi := MeshInstance3D.new()
